@@ -101,10 +101,14 @@ private:
 /* Tests the rcl_init() and rcl_shutdown() functions.
  */
 TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_init_and_shutdown) {
+  EXPECT_EQ(errno, 0); errno = 0;
+
   rcl_ret_t ret;
   rcl_init_options_t init_options = rcl_get_zero_initialized_init_options();
+
   ret = rcl_init_options_init(&init_options, rcl_get_default_allocator());
   ASSERT_EQ(RCL_RET_OK, ret) << rcl_get_error_string().str;
+  EXPECT_EQ(errno, 0); errno = 0;
   rcl_context_t context = rcl_get_zero_initialized_context();
   // A shutdown before any init has been called should fail.
   ret = rcl_shutdown(&context);
@@ -151,24 +155,29 @@ TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_init_and_shutdown
   // If argc is 0 and argv is nullptr and the allocator is valid, it should succeed.
   ret = rcl_init(0, nullptr, &init_options, &context);
   EXPECT_EQ(RCL_RET_OK, ret);
+  EXPECT_EQ(errno, 0); errno = 0;
   ASSERT_TRUE(rcl_context_is_valid(&context));
   // Then shutdown should work.
   ret = rcl_shutdown(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   ASSERT_FALSE(rcl_context_is_valid(&context));
   ret = rcl_context_fini(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   context = rcl_get_zero_initialized_context();
   // Valid argc/argv values and a valid allocator should succeed.
   {
     FakeTestArgv test_args;
     ret = rcl_init(test_args.argc, test_args.argv, &init_options, &context);
     EXPECT_EQ(RCL_RET_OK, ret);
+    EXPECT_EQ(errno, 0); errno = 0;
     ASSERT_TRUE(rcl_context_is_valid(&context));
   }
   // Then shutdown should work.
   ret = rcl_shutdown(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   ASSERT_FALSE(rcl_context_is_valid(&context));
   // Then a repeated shutdown should fail.
   ret = rcl_shutdown(&context);
@@ -177,6 +186,7 @@ TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_init_and_shutdown
   rcl_reset_error();
   ret = rcl_context_fini(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   context = rcl_get_zero_initialized_context();
   // A repeat call to shutdown should not work.
   ret = rcl_shutdown(&context);
@@ -188,6 +198,7 @@ TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_init_and_shutdown
     FakeTestArgv test_args;
     ret = rcl_init(test_args.argc, test_args.argv, &init_options, &context);
     EXPECT_EQ(RCL_RET_OK, ret);
+    EXPECT_EQ(errno, 0); errno = 0;
     ASSERT_TRUE(rcl_context_is_valid(&context));
     ret = rcl_init(test_args.argc, test_args.argv, &init_options, &context);
     EXPECT_EQ(RCL_RET_ALREADY_INIT, ret);
@@ -197,13 +208,16 @@ TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_init_and_shutdown
   // But shutdown should still work.
   ret = rcl_shutdown(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   ASSERT_FALSE(rcl_context_is_valid(&context));
   ret = rcl_context_fini(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   context = rcl_get_zero_initialized_context();
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     EXPECT_EQ(RCL_RET_OK, rcl_init_options_fini(&init_options)) << rcl_get_error_string().str;
+    EXPECT_EQ(errno, 0); errno = 0;
   });
 }
 
@@ -225,14 +239,17 @@ TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_get_instance_id) 
   rcl_init_options_t init_options = rcl_get_zero_initialized_init_options();
   ret = rcl_init_options_init(&init_options, rcl_get_default_allocator());
   ASSERT_EQ(RCL_RET_OK, ret) << rcl_get_error_string().str;
+  EXPECT_EQ(errno, 0); errno = 0;
   OSRF_TESTING_TOOLS_CPP_SCOPE_EXIT(
   {
     EXPECT_EQ(RCL_RET_OK, rcl_init_options_fini(&init_options)) << rcl_get_error_string().str;
+    EXPECT_EQ(errno, 0); errno = 0;
   });
   {
     FakeTestArgv test_args;
     ret = rcl_init(test_args.argc, test_args.argv, &init_options, &context);
     EXPECT_EQ(RCL_RET_OK, ret);
+    EXPECT_EQ(errno, 0); errno = 0;
     ASSERT_TRUE(rcl_context_is_valid(&context));
   }
   // And it should be allocation free.
@@ -248,16 +265,19 @@ TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_get_instance_id) 
   // Calling after a shutdown should return 0.
   ret = rcl_shutdown(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   EXPECT_EQ(0u, rcl_context_get_instance_id(&context));
   ASSERT_FALSE(rcl_context_is_valid(&context));
   ret = rcl_context_fini(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   context = rcl_get_zero_initialized_context();
   // It should return a different value after another valid init.
   {
     FakeTestArgv test_args;
     ret = rcl_init(test_args.argc, test_args.argv, &init_options, &context);
     EXPECT_EQ(RCL_RET_OK, ret);
+    EXPECT_EQ(errno, 0); errno = 0;
     ASSERT_TRUE(rcl_context_is_valid(&context));
   }
   EXPECT_NE(0u, rcl_context_get_instance_id(&context));
@@ -266,8 +286,10 @@ TEST_F(CLASSNAME(TestRCLFixture, RMW_IMPLEMENTATION), test_rcl_get_instance_id) 
   // Shutting down a second time should result in 0 again.
   ret = rcl_shutdown(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
   EXPECT_EQ(0u, rcl_context_get_instance_id(&context));
   ASSERT_FALSE(rcl_context_is_valid(&context));
   ret = rcl_context_fini(&context);
   EXPECT_EQ(ret, RCL_RET_OK);
+  EXPECT_EQ(errno, 0); errno = 0;
 }
