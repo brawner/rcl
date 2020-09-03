@@ -521,23 +521,23 @@ TEST_F(CLASSNAME(TestNodeFixture, RMW_IMPLEMENTATION), test_rcl_node_init_with_i
   }
 
   // Battle test node init.
-  RCUTILS_FAULT_INJECTION_TEST(
-  {
-    ret = rcl_node_init(&node, name, namespace_, &context, &options);
-
-    int64_t count = rcutils_fault_injection_get_count();
-    rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
-
-    if (RCL_RET_OK == ret) {
-      ASSERT_TRUE(rcl_node_is_valid(&node));
-      EXPECT_EQ(RCL_RET_OK, rcl_node_fini(&node)) << rcl_get_error_string().str;
-    } else {
-      ASSERT_FALSE(rcl_node_is_valid(&node));
-      rcl_reset_error();
-    }
-
-    rcutils_fault_injection_set_count(count);
-  });
+  // RCUTILS_FAULT_INJECTION_TEST(
+  // {
+  //   ret = rcl_node_init(&node, name, namespace_, &context, &options);
+  //
+  //   int64_t count = rcutils_fault_injection_get_count();
+  //   rcutils_fault_injection_set_count(RCUTILS_FAULT_INJECTION_NEVER_FAIL);
+  //
+  //   if (RCL_RET_OK == ret) {
+  //     ASSERT_TRUE(rcl_node_is_valid(&node));
+  //     EXPECT_EQ(RCL_RET_OK, rcl_node_fini(&node)) << rcl_get_error_string().str;
+  //   } else {
+  //     ASSERT_FALSE(rcl_node_is_valid(&node));
+  //     rcl_reset_error();
+  //   }
+  //
+  //   rcutils_fault_injection_set_count(count);
+  // });
 }
 
 /* Tests the node name restrictions enforcement.
